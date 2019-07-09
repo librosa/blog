@@ -1,4 +1,4 @@
-Title: Sampling rate shenanings
+Title: Sampling rate shenanigans
 Slug: resample-on-load
 Date: 2019/07/09
 Author: Brian McFee
