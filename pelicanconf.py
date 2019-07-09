@@ -6,6 +6,7 @@ AUTHOR = 'librosa development team'
 SITENAME = 'librosa blog'
 SITEURL = 'https://librosa.github.io/blog'
 SITESUBTITLE = '<code> import librosa </code>'
+SITELOGO = 'images/librosa_logo.png'
 
 PATH = 'content'
 
@@ -29,8 +30,6 @@ LINKS = (('librosa Home', 'https://librosa.github.io/'),
 # SOCIAL = (('You can add links in your config file', '#'),
 #          ('Another social link', '#'),)
 
-DEFAULT_PAGINATION = False
-
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
 
@@ -52,8 +51,8 @@ CODE_DIR = 'downloads/code'
 NOTEBOOK_DIR = 'downloads/notebooks'
 
 # Set the article URL
-ARTICLE_URL = 'blog/{date:%Y}/{date:%m}/{date:%d}/{slug}/'
-ARTICLE_SAVE_AS = 'blog/{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
+ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}/'
+ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
 
 DEFAULT_PAGINATION = 10
 
@@ -63,5 +62,4 @@ STATIC_PATHS = ['images', 'figures', 'videos', 'downloads', 'favicon.ico']
 
 THEME = 'themes/Flex'
 
-SITELOGO = '/images/librosa_logo.png'
 PYGMENTS_STYLE = 'python'
