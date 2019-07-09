@@ -1,5 +1,89 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>librosa blog - blog</title><link href="https://librosa.github.io/blog/" rel="alternate"></link><link href="https://librosa.github.io/blog/feeds/blog.atom.xml" rel="self"></link><id>https://librosa.github.io/blog/</id><updated>2019-07-09T00:00:00-04:00</updated><subtitle>&lt;code&gt; import librosa &lt;/code&gt;</subtitle><entry><title>Sampling rate shenanings</title><link href="https://librosa.github.io/blog/2019/07/09/resample-on-load/" rel="alternate"></link><published>2019-07-09T00:00:00-04:00</published><updated>2019-07-09T00:00:00-04:00</updated><author><name>Brian McFee</name></author><id>tag:librosa.github.io,2019-07-09:/blog/2019/07/09/resample-on-load/</id><summary type="html">&lt;p&gt;Why does librosa resample on load?&lt;/p&gt;</summary><content type="html">&lt;style type="text/css"&gt;/*!
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="../../../../theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="../../../../theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="../../../../theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="../../../../theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="../../../../theme/font-awesome/css/solid.css">
+
+
+    <link href="https://librosa.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="librosa blog Atom">
+
+
+
+
+
+<meta name="author" content="Brian McFee" />
+<meta name="description" content="Why does librosa resample on load?" />
+<meta name="keywords" content="">
+
+<meta property="og:site_name" content="librosa blog"/>
+<meta property="og:title" content="Sampling rate shenanings"/>
+<meta property="og:description" content="Why does librosa resample on load?"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="../../../../2019/07/09/resample-on-load/"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2019-07-09 00:00:00-04:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="../../../../author/brian-mcfee.html">
+<meta property="article:section" content="blog"/>
+<meta property="og:image" content="/blog/images/librosa_logo.png">
+
+  <title>librosa blog &ndash; Sampling rate shenanings</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="../../../..">
+        <img src="/blog/images/librosa_logo.png" alt="" title="">
+      </a>
+      <h1><a href="../../../.."></a></h1>
+
+<p><code> import librosa </code></p>
+      <nav>
+        <ul class="list">
+
+          <li><a href="https://librosa.github.io/" target="_blank">librosa Home</a></li>
+          <li><a href="https://librosa.github.io/librosa" target="_blank">API Documentation</a></li>
+          <li><a href="https://groups.google.com/forum/#!forum/librosa" target="_blank">Discussion Forum</a></li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+
+<article class="single">
+  <header>
+      
+    <h1 id="resample-on-load">Sampling rate shenanings</h1>
+    <p>
+          Posted on Tue 09 July 2019 in <a href="../../../../category/blog.html">blog</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <style type="text/css">/*!
 *
 * IPython notebook
 *
@@ -361,7 +445,7 @@ div.unrecognized_cell .inner_cell a:hover {
   text-decoration: none;
 }
 @media (max-width: 540px) {
-  div.unrecognized_cell &gt; div.prompt {
+  div.unrecognized_cell > div.prompt {
     display: none;
   }
 }
@@ -414,19 +498,19 @@ div.input_prompt {
   color: #303F9F;
   border-top: 1px solid transparent;
 }
-div.input_area &gt; div.highlight {
+div.input_area > div.highlight {
   margin: 0.4em;
   border: none;
   padding: 0px;
   background-color: transparent;
 }
-div.input_area &gt; div.highlight &gt; pre {
+div.input_area > div.highlight > pre {
   margin: 0px;
   border: none;
   padding: 0px;
   background-color: transparent;
 }
-/* The following gets added to the &lt;head&gt; if it is detected that the user has a
+/* The following gets added to the <head> if it is detected that the user has a
  * monospace font with inconsistent normal/bold/italic height.  See
  * notebookmain.js.  Such fonts will have keywords vertically offset with
  * respect to the rest of the text.  The user should select a better font.
@@ -487,7 +571,7 @@ div.input_area &gt; div.highlight &gt; pre {
 }
 /*
 
-Original style from softwaremaniacs.org (c) Ivan Sagalaev &lt;Maniac@SoftwareManiacs.Org&gt;
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
 Adapted from GitHub theme
 
 */
@@ -731,7 +815,7 @@ div.output_area img.unconfined,
 div.output_area svg.unconfined {
   max-width: none;
 }
-div.output_area .mglyph &gt; img {
+div.output_area .mglyph > img {
   max-width: none;
 }
 /* This is needed to protect the pre formating from global settings such
@@ -969,7 +1053,7 @@ div.text_cell {
   align-items: stretch;
 }
 @media (max-width: 540px) {
-  div.text_cell &gt; div.prompt {
+  div.text_cell > div.prompt {
     display: none;
   }
 }
@@ -1041,8 +1125,8 @@ h6:hover .anchor-link {
   font-size: 100%;
   font-style: italic;
 }
-&lt;/style&gt;
-&lt;style type="text/css"&gt;.highlight .hll { background-color: #ffffcc }
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
 .highlight  { background: #f8f8f8; }
 .highlight .c { color: #408080; font-style: italic } /* Comment */
 .highlight .err { border: 1px solid #FF0000 } /* Error */
@@ -1110,8 +1194,8 @@ h6:hover .anchor-link {
 .highlight .vg { color: #19177C } /* Name.Variable.Global */
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
-.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */&lt;/style&gt;
-&lt;style type="text/css"&gt;
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
+<style type="text/css">
 /* Temporary definitions which will become obsolete with Notebook release 5.0 */
 .ansi-black-fg { color: #3E424D; }
 .ansi-black-bg { background-color: #3E424D; }
@@ -1147,92 +1231,92 @@ h6:hover .anchor-link {
 .ansi-white-intense-bg { background-color: #A1A6B2; }
 
 .ansi-bold { font-weight: bold; }
-&lt;/style&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
-&lt;/div&gt;&lt;div class="inner_cell"&gt;
-&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;One of the questions that I get most often has to do with how &lt;code&gt;librosa&lt;/code&gt; handles loading of audio data, specifically,&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Why does librosa always resample to 22050 Hz when I load a file?&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;This is an entirely reasonable question, and the answer isn't necessarily obvious.  Rather than bury the explanation in the API documentation, I'm putting the explanation here in blog form.&lt;/p&gt;
+</style>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>One of the questions that I get most often has to do with how <code>librosa</code> handles loading of audio data, specifically,</p>
+<p><strong>Why does librosa always resample to 22050 Hz when I load a file?</strong></p>
+<p>This is an entirely reasonable question, and the answer isn't necessarily obvious.  Rather than bury the explanation in the API documentation, I'm putting the explanation here in blog form.</p>
 
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
-&lt;/div&gt;&lt;div class="inner_cell"&gt;
-&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="What-is-a-sampling-rate?"&gt;What is a sampling rate?&lt;a class="anchor-link" href="#What-is-a-sampling-rate?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Before diving into the details, we first need to all get on the same page about what a &lt;em&gt;sampling rate&lt;/em&gt; is.
-Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.&lt;br&gt;
-The sampling rate --- typically $f_s$ in the digital signal processing literature, or &lt;code&gt;sr&lt;/code&gt; in &lt;code&gt;librosa&lt;/code&gt; --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples.
-Equivalently, $f_s$ is the number of &lt;em&gt;observations per second&lt;/em&gt; in the discretely sampled signal.
-It's a basic fact, a &lt;a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem"&gt;theorem&lt;/a&gt; due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ sufficies to reconstruct the signal without introducing &lt;a href="https://en.wikipedia.org/wiki/Aliasing"&gt;aliasing&lt;/a&gt; artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $1/2 f_s$ before sampling.&lt;/p&gt;
-&lt;p&gt;Compact discs (remember those?) used a standard sampling rate of 44100 Hz.  This is partly because typical human perception tops out around 20000 Hz (hence $f_s \geq 40000$), and partly due to &lt;a href="https://en.wikipedia.org/wiki/44,100_Hz"&gt;historical accidents&lt;/a&gt;.&lt;/p&gt;
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="What-is-a-sampling-rate?">What is a sampling rate?<a class="anchor-link" href="#What-is-a-sampling-rate?">&#182;</a></h2><p>Before diving into the details, we first need to all get on the same page about what a <em>sampling rate</em> is.
+Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.<br>
+The sampling rate --- typically $f_s$ in the digital signal processing literature, or <code>sr</code> in <code>librosa</code> --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples.
+Equivalently, $f_s$ is the number of <em>observations per second</em> in the discretely sampled signal.
+It's a basic fact, a <a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem">theorem</a> due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ sufficies to reconstruct the signal without introducing <a href="https://en.wikipedia.org/wiki/Aliasing">aliasing</a> artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $1/2 f_s$ before sampling.</p>
+<p>Compact discs (remember those?) used a standard sampling rate of 44100 Hz.  This is partly because typical human perception tops out around 20000 Hz (hence $f_s \geq 40000$), and partly due to <a href="https://en.wikipedia.org/wiki/44,100_Hz">historical accidents</a>.</p>
 
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
-&lt;/div&gt;&lt;div class="inner_cell"&gt;
-&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="Why-not-use-the-file's-native-sampling-rate?"&gt;Why not use the file's native sampling rate?&lt;a class="anchor-link" href="#Why-not-use-the-file's-native-sampling-rate?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Every digital audio file contains, among other things, a collection of &lt;em&gt;samples&lt;/em&gt; and a number indicating the &lt;em&gt;sampling rate&lt;/em&gt;.  Most audio formats allow different values for the sampling rate, so you can't necessarily assume, for example, that all .wav files are recorded at the same rate.  Some will be at 22050 Hz, some at 44100 Hz, some at 48000 Hz, some at 16000 Hz.  This raises an obvious question though: why does it matter what the audio's native sampling rate is?&lt;/p&gt;
-&lt;p&gt;When designing the librosa API, we had a few goals that weren't always necessarily in agreement.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;First&lt;/strong&gt;, we wanted it to be relatively simple to use, and have consistent default parameters shared across all functions.  As &lt;a href="https://www.youtube.com/watch?v=eVDDL6tgsv8&amp;amp;t=2406s"&gt;Gael Varoquaux&lt;/a&gt; reiterated in his keynote at SciPy 2017: consistency, consistency, consistency!  Having standardized default parameters means that a user is less likely to be surprised by unexpected behavior when working with different parts of the library.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Second&lt;/strong&gt;, we wanted the default parameters, such as frame length (number of samples in one frame of a short-time Fourier transform), to be expressed naturally.  In audio signal processing, there are two ways this could have gone: either specify the frame length as a duration (in seconds), or as a number of samples.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Expressing frame length as a duration is nice because it uses real, physical units and is independent of the sampling rate: a 1-second frame occupies the same amount of "content", whether the sampling rate is 8000 or 16000 Hz.  However, this would mean that the same function applied to two signals with different sampling rates would produce outputs of different dimensionality, and would therefore not be directly comparable.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Expressing frame length as a number of samples, on the other hand, always produces outputs of comparable dimension.  However, the meaning of the contents can change, depending on the sampling rate.  As it turns out, designing for dimensional compatibility is much more convenient when you consider that subsequent processing stages will need to know the dimension of the input data to operate correctly.  It's easier to fix the sampling rate first, and then design around that, than vice versa.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Expressing frame length in terms of samples has the added bonus that we can design for efficiently calculable Fourier transforms.  Most fast Fourier transform (FFT) implementations work best when the number of samples is an integral power of 2, and worst when the number is a large prime.  Although the latter case is unlikely in general, defining frames in terms of samples leaves us in a better position to guarantee efficient implementation.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;Third&lt;/strong&gt;, we wanted to minimize the chance of users (i.e., myself) making simple mistakes by not accounting for the sampling rate.  An analysis script, once written, should behave consistently across different input signals, and not depend strongly on the exact sampling rate.  In practice, this meant that every analysis script involved immediately standardizing the sampling rate of a file after it was loaded, so it made sense to combine the two steps into one (by default) since it's the most common case when dealing with collections of audio.&lt;/p&gt;
-&lt;p&gt;After a bit of discussion, we pretty quickly decided that resample-on-load was the best compromise available for achieving consistency and simplicity at the API level.&lt;/p&gt;
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Why-not-use-the-file's-native-sampling-rate?">Why not use the file's native sampling rate?<a class="anchor-link" href="#Why-not-use-the-file's-native-sampling-rate?">&#182;</a></h2><p>Every digital audio file contains, among other things, a collection of <em>samples</em> and a number indicating the <em>sampling rate</em>.  Most audio formats allow different values for the sampling rate, so you can't necessarily assume, for example, that all .wav files are recorded at the same rate.  Some will be at 22050 Hz, some at 44100 Hz, some at 48000 Hz, some at 16000 Hz.  This raises an obvious question though: why does it matter what the audio's native sampling rate is?</p>
+<p>When designing the librosa API, we had a few goals that weren't always necessarily in agreement.</p>
+<p><strong>First</strong>, we wanted it to be relatively simple to use, and have consistent default parameters shared across all functions.  As <a href="https://www.youtube.com/watch?v=eVDDL6tgsv8&amp;t=2406s">Gael Varoquaux</a> reiterated in his keynote at SciPy 2017: consistency, consistency, consistency!  Having standardized default parameters means that a user is less likely to be surprised by unexpected behavior when working with different parts of the library.</p>
+<p><strong>Second</strong>, we wanted the default parameters, such as frame length (number of samples in one frame of a short-time Fourier transform), to be expressed naturally.  In audio signal processing, there are two ways this could have gone: either specify the frame length as a duration (in seconds), or as a number of samples.</p>
+<ul>
+<li><p>Expressing frame length as a duration is nice because it uses real, physical units and is independent of the sampling rate: a 1-second frame occupies the same amount of "content", whether the sampling rate is 8000 or 16000 Hz.  However, this would mean that the same function applied to two signals with different sampling rates would produce outputs of different dimensionality, and would therefore not be directly comparable.</p>
+</li>
+<li><p>Expressing frame length as a number of samples, on the other hand, always produces outputs of comparable dimension.  However, the meaning of the contents can change, depending on the sampling rate.  As it turns out, designing for dimensional compatibility is much more convenient when you consider that subsequent processing stages will need to know the dimension of the input data to operate correctly.  It's easier to fix the sampling rate first, and then design around that, than vice versa.</p>
+</li>
+<li><p>Expressing frame length in terms of samples has the added bonus that we can design for efficiently calculable Fourier transforms.  Most fast Fourier transform (FFT) implementations work best when the number of samples is an integral power of 2, and worst when the number is a large prime.  Although the latter case is unlikely in general, defining frames in terms of samples leaves us in a better position to guarantee efficient implementation.</p>
+</li>
+</ul>
+<p><strong>Third</strong>, we wanted to minimize the chance of users (i.e., myself) making simple mistakes by not accounting for the sampling rate.  An analysis script, once written, should behave consistently across different input signals, and not depend strongly on the exact sampling rate.  In practice, this meant that every analysis script involved immediately standardizing the sampling rate of a file after it was loaded, so it made sense to combine the two steps into one (by default) since it's the most common case when dealing with collections of audio.</p>
+<p>After a bit of discussion, we pretty quickly decided that resample-on-load was the best compromise available for achieving consistency and simplicity at the API level.</p>
 
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
-&lt;/div&gt;&lt;div class="inner_cell"&gt;
-&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?"&gt;Okay... but why 22050 Hz?  Why not 44100 or 48000?&lt;a class="anchor-link" href="#Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;It's true: 44100 Hz is essentially the standard for "high (enough) quality" audio storage, and it would have been a sensible default.&lt;/p&gt;
-&lt;p&gt;However, we decided for the lower rate of 22050 for two reasons:&lt;/p&gt;
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?">Okay... but why 22050 Hz?  Why not 44100 or 48000?<a class="anchor-link" href="#Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?">&#182;</a></h2><p>It's true: 44100 Hz is essentially the standard for "high (enough) quality" audio storage, and it would have been a sensible default.</p>
+<p>However, we decided for the lower rate of 22050 for two reasons:</p>
 
-&lt;pre&gt;&lt;code&gt;1. It cuts down on memory consumption,
+<pre><code>1. It cuts down on memory consumption,
 2. 44100 was overkill for our most common tasks.
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The first point is obvious, but the second point deserves a bit more discussion.&lt;/p&gt;
-&lt;p&gt;When we were initially developing librosa, our main use cases were analyzing corpora of old jazz recordings, music more generally, and speech signals.  While humans (young ones, anyway) can hear up to around 20000 Hz, it's possible to successfully analyze music and speech data at much lower rates without sacrificing much.  The highest pithces we usually care about detecting are around $C_9 \approx 8372~\text{Hz}$, well below the 11025 cutoff implied by $f_s = 22050$.  There's certainly content above 11025 Hz, but it often turns out to be noisy or redundant with the lower parts of the spectrum, and not so informative for semantic analysis tasks like instrument classification, rhythm analysis, chord recognition, and so on.&lt;/p&gt;
+</code></pre>
+<p>The first point is obvious, but the second point deserves a bit more discussion.</p>
+<p>When we were initially developing librosa, our main use cases were analyzing corpora of old jazz recordings, music more generally, and speech signals.  While humans (young ones, anyway) can hear up to around 20000 Hz, it's possible to successfully analyze music and speech data at much lower rates without sacrificing much.  The highest pithces we usually care about detecting are around $C_9 \approx 8372~\text{Hz}$, well below the 11025 cutoff implied by $f_s = 22050$.  There's certainly content above 11025 Hz, but it often turns out to be noisy or redundant with the lower parts of the spectrum, and not so informative for semantic analysis tasks like instrument classification, rhythm analysis, chord recognition, and so on.</p>
 
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
-&lt;/div&gt;&lt;div class="inner_cell"&gt;
-&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="I-still-don't-like-it.--What-can-I-do?"&gt;I still don't like it.  What can I do?&lt;a class="anchor-link" href="#I-still-don't-like-it.--What-can-I-do?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Sure, 22050 isn't right for every situation.  It's a default setting, but not a requirement!&lt;/p&gt;
-&lt;p&gt;You have a few options though.  First, you can always bypass resample-on-load by specifying &lt;code&gt;sr=None&lt;/code&gt;:&lt;/p&gt;
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="I-still-don't-like-it.--What-can-I-do?">I still don't like it.  What can I do?<a class="anchor-link" href="#I-still-don't-like-it.--What-can-I-do?">&#182;</a></h2><p>Sure, 22050 isn't right for every situation.  It's a default setting, but not a requirement!</p>
+<p>You have a few options though.  First, you can always bypass resample-on-load by specifying <code>sr=None</code>:</p>
 
-&lt;pre&gt;&lt;code&gt;y, sr = librosa.load(filename, sr=None)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;You will need to remember to pass &lt;code&gt;sr&lt;/code&gt; around to all relevant functions, and make sure your frame and hop lengths are tuned accordingly.&lt;/p&gt;
-&lt;p&gt;A slightly fancier alternative is to use the &lt;code&gt;presets&lt;/code&gt; package, as illustrated in the &lt;a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py"&gt;example gallery&lt;/a&gt; to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like &lt;code&gt;librosa&lt;/code&gt;, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific &lt;code&gt;sr&lt;/code&gt; value aruond with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:&lt;/p&gt;
+<pre><code>y, sr = librosa.load(filename, sr=None)</code></pre>
+<p>You will need to remember to pass <code>sr</code> around to all relevant functions, and make sure your frame and hop lengths are tuned accordingly.</p>
+<p>A slightly fancier alternative is to use the <code>presets</code> package, as illustrated in the <a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py">example gallery</a> to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like <code>librosa</code>, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific <code>sr</code> value aruond with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:</p>
 
-&lt;pre&gt;&lt;code&gt;from presets import Preset
+<pre><code>from presets import Preset
 import librosa as _librosa
 librosa = Preset(_librosa)
 librosa['sr'] = 44100
 librosa['n_fft'] = 4096
-librosa['hop_length'] = 1024&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;would effectively change the default sampling rate to 44100, and double the frame and hop lengths &lt;code&gt;n_fft&lt;/code&gt; and &lt;code&gt;hop_length&lt;/code&gt; from their standard default values.  These new defaults would persist throughout your coding session.&lt;/p&gt;
+librosa['hop_length'] = 1024</code></pre>
+<p>would effectively change the default sampling rate to 44100, and double the frame and hop lengths <code>n_fft</code> and <code>hop_length</code> from their standard default values.  These new defaults would persist throughout your coding session.</p>
 
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
+</div>
+</div>
+</div>
  
 
 
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
@@ -1259,4 +1343,38 @@ librosa['hop_length'] = 1024&lt;/code&gt;&lt;/pre&gt;
         "}); ";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content></entry></feed>
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>&copy;  </p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " librosa blog ",
+  "url" : "../../../..",
+  "image": "/blog/images/librosa_logo.png",
+  "description": ""
+}
+</script>
+
+</body>
+</html>
