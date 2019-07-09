@@ -6,9 +6,10 @@ AUTHOR = 'librosa development team'
 SITENAME = 'librosa blog'
 SITEURL = 'https://librosa.github.io/blog'
 SITESUBTITLE = '<code> import librosa </code>'
-SITELOGO = 'images/librosa_logo.png'
+SITELOGO = '/images/librosa_logo.png'
 
 PATH = 'content'
+DEFAULT_CATEGORY = 'blog'
 
 TIMEZONE = 'America/New_York'
 
@@ -23,8 +24,8 @@ AUTHOR_FEED_RSS = None
 
 # Blogroll
 LINKS = (('librosa Home', 'https://librosa.github.io/'),
-         ('Documentation', 'https://librosa.github.io/librosa'),
-         ('Forum', 'https://groups.google.com/forum/#!forum/librosa'),)
+         ('API Documentation', 'https://librosa.github.io/librosa'),
+         ('Discussion Forum', 'https://groups.google.com/forum/#!forum/librosa'),)
 
 # Social widget
 # SOCIAL = (('You can add links in your config file', '#'),
@@ -42,7 +43,8 @@ PLUGINS = [
     'liquid_tags.img',  # embedding images
     'liquid_tags.video',  # embedding videos
     'liquid_tags.include_code',  # including code blocks
-    'liquid_tags.literal'
+    'liquid_tags.literal',
+    'share_post'
 ]
 IGNORE_FILES = ['.ipynb_checkpoints']
 
@@ -61,5 +63,3 @@ ENABLE_MATHJAX = True
 STATIC_PATHS = ['images', 'figures', 'videos', 'downloads', 'favicon.ico']
 
 THEME = 'themes/Flex'
-
-PYGMENTS_STYLE = 'python'
