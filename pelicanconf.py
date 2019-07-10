@@ -16,7 +16,7 @@ TIMEZONE = 'America/New_York'
 DEFAULT_LANG = 'en'
 
 # Feed generation is usually not desired when developing
-FEED_ALL_ATOM = None
+FEED_ALL_ATOM = 'feeds/all.atom.xml'
 CATEGORY_FEED_ATOM = None
 TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
@@ -30,6 +30,11 @@ LINKS = (('home', 'https://librosa.github.io/'),
 # Social widget
 # SOCIAL = (('You can add links in your config file', '#'),
 #          ('Another social link', '#'),)
+
+SOCIAL = (
+    ('github', 'https://github.com/librosa/librosa'),
+    ('rss', '/blog/feeds/all.atom.xml'),
+)
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
@@ -53,6 +58,7 @@ NOTEBOOK_DIR = 'downloads/notebooks'
 # Set the article URL
 ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}/'
 ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
+IPYNB_NB_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}.ipynb'
 
 DEFAULT_PAGINATION = 10
 
@@ -61,3 +67,5 @@ ENABLE_MATHJAX = True
 STATIC_PATHS = ['images', 'figures', 'videos', 'downloads', 'favicon.ico']
 
 THEME = 'themes/Flex'
+
+COPYRIGHT_YEAR = '2019'
