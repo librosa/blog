@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = 'librosa development team'
 SITENAME = 'librosa blog'
 SITEURL = 'https://librosa.github.io/blog'
-SITESUBTITLE = '<code> import librosa </code>'
+SITESUBTITLE = '<code> import <span style="color: pink">librosa</span> </code>'
 SITELOGO = '/images/librosa_logo.png'
 
 PATH = 'content'
@@ -23,9 +23,9 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('librosa Home', 'https://librosa.github.io/'),
-         ('API Documentation', 'https://librosa.github.io/librosa'),
-         ('Discussion Forum', 'https://groups.google.com/forum/#!forum/librosa'),)
+LINKS = (('home', 'https://librosa.github.io/'),
+         ('documentation', 'https://librosa.github.io/librosa'),
+         ('forum', 'https://groups.google.com/forum/#!forum/librosa'),)
 
 # Social widget
 # SOCIAL = (('You can add links in your config file', '#'),
@@ -38,13 +38,11 @@ MARKUP = ['md']
 PLUGIN_PATHS = ['./plugins', './plugins/pelican-plugins']
 PLUGINS = [
     'summary',       # auto-summarizing articles
-    'feed_summary',  # use summaries for RSS, not full articles
     'ipynb.liquid',  # for embedding notebooks
     'liquid_tags.img',  # embedding images
     'liquid_tags.video',  # embedding videos
     'liquid_tags.include_code',  # including code blocks
     'liquid_tags.literal',
-    'share_post'
 ]
 IGNORE_FILES = ['.ipynb_checkpoints']
 
