@@ -1,7 +1,7 @@
-Title: Sampling rate shenanigans
+Title: Why resample on load?
 Slug: resample-on-load
 Date: 2019/07/09
 Author: Brian McFee
-Summary: Why does librosa resample on load?
+Summary: This post explains why we decided to make librosa standardize sampling rates on load.
 
 {% notebook downloads/notebooks/Sampling-rate.ipynb %}
