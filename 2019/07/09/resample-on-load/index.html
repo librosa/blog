@@ -51,13 +51,13 @@
       </a>
       <h1><a href="../../../.."></a></h1>
 
-<p><code> import librosa </code></p>
+<p><code> import <span style="color: pink">librosa</span> </code></p>
       <nav>
         <ul class="list">
 
-          <li><a href="https://librosa.github.io/" target="_blank">librosa Home</a></li>
-          <li><a href="https://librosa.github.io/librosa" target="_blank">API Documentation</a></li>
-          <li><a href="https://groups.google.com/forum/#!forum/librosa" target="_blank">Discussion Forum</a></li>
+          <li><a href="https://librosa.github.io/" target="_blank">home</a></li>
+          <li><a href="https://librosa.github.io/librosa" target="_blank">documentation</a></li>
+          <li><a href="https://groups.google.com/forum/#!forum/librosa" target="_blank">forum</a></li>
         </ul>
       </nav>
 
@@ -1245,7 +1245,7 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="What-is-a-sampling-rate?">What is a sampling rate?<a class="anchor-link" href="#What-is-a-sampling-rate?">&#182;</a></h2><p>Before diving into the details, we first need to all get on the same page about what a <em>sampling rate</em> is. Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.  The sampling rate --- typically $f_s$ in the digital signal processing literature, or <code>sr</code> in <code>librosa</code> --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples. Equivalently, $f_s$ is the number of <em>observations per second</em> in the discretely sampled signal. It's a basic fact, a <a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem">theorem</a> due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ sufficies to reconstruct the signal without introducing <a href="https://en.wikipedia.org/wiki/Aliasing">aliasing</a> artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $1/2 f_s$ before sampling.</p>
+<h2 id="What-is-a-sampling-rate?">What is a sampling rate?<a class="anchor-link" href="#What-is-a-sampling-rate?">&#182;</a></h2><p>Before diving into the details, we first need to all get on the same page about what a <em>sampling rate</em> is. Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.  The sampling rate --- typically $f_s$ in the digital signal processing literature, or <code>sr</code> in <code>librosa</code> --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples. Equivalently, $f_s$ is the number of <em>observations per second</em> in the discretely sampled signal. It's a basic fact, a <a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem">theorem</a> due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ sufficies to reconstruct the signal without introducing <a href="https://en.wikipedia.org/wiki/Aliasing">aliasing</a> artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $f_s/2$ before sampling.</p>
 <p>For a fixed sampling rate $f_s$, a digital signal is represented as a sequence of <em>samples</em>: $y[n]$ (for $n = 0, 1, 2, \dots$), where the $n^\text{th}$ sample corresponds to the value of the signal at time $t = \frac{n}{f_s}$.  This gives a general rule for converting between units of <em>samples</em> and units of <em>time</em>, which is helpful to have in the back of your head when reasoning about software interface design later on.</p>
 <p>Compact discs (remember those?) used a standard sampling rate of 44100 Hz.  This is partly because typical human perception tops out around 20000 Hz (hence $f_s \geq 40000$), and partly due to <a href="https://en.wikipedia.org/wiki/44,100_Hz">historical accidents</a>.  Unlike physical media (CDs), digital audio files (.WAV, .MP3, and so on) can have arbitrary sampling rates. Rates of 16000, 22050, 32000, 44100, and 48000 are all relatively common, and you can't rely on consistency from one file to the next.  Fortunately, sample-rate conversion (or <em>resampling</em>) methods allow us to change the sampling rate of a digital signal as needed.</p>
 
@@ -1277,11 +1277,10 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?">Okay... but why 22050 Hz?  Why not 44100 or 48000?<a class="anchor-link" href="#Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?">&#182;</a></h2><p>It's true: 44100 Hz is essentially the standard for "high (enough) quality" audio storage, and it would have been a sensible default.</p>
 <p>However, we decided for the lower rate of 22050 for two reasons:</p>
-
-<pre><code>1. It cuts down on memory consumption,
-2. 44100 was overkill for our most common tasks.
-
-</code></pre>
+<ol>
+<li>It cuts down on memory consumption,</li>
+<li>44100 was overkill for our most common tasks.</li>
+</ol>
 <p>The first point is obvious, but the second point deserves a bit more discussion.</p>
 <p>When we were initially developing librosa, our main use cases were analyzing corpora of old jazz recordings, music more generally, and speech signals.  While humans (young ones, anyway) can hear up to around 20000 Hz, it's possible to successfully analyze music and speech data at much lower rates without sacrificing much.  The highest pithces we usually care about detecting are around $C_9 \approx 8372~\text{Hz}$, well below the 11025 cutoff implied by $f_s = 22050$.  There's certainly content above 11025 Hz, but it often turns out to be noisy or redundant with the lower parts of the spectrum, and not so informative for semantic analysis tasks like instrument classification, rhythm analysis, chord recognition, and so on.</p>
 
@@ -1293,17 +1292,17 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="I-still-don't-like-it.--What-can-I-do?">I still don't like it.  What can I do?<a class="anchor-link" href="#I-still-don't-like-it.--What-can-I-do?">&#182;</a></h2><p>Sure, 22050 isn't right for every situation.  It's a default setting, but not a requirement!</p>
 <p>You have a few options though.  First, you can always bypass resample-on-load by specifying <code>sr=None</code>:</p>
-
-<pre><code>y, sr = librosa.load(filename, sr=None)</code></pre>
+<div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
 <p>You will need to remember to pass <code>sr</code> around to all relevant functions, and make sure your frame and hop lengths are tuned accordingly.</p>
 <p>A slightly fancier alternative is to use the <code>presets</code> package, as illustrated in the <a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py">example gallery</a> to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like <code>librosa</code>, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific <code>sr</code> value aruond with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:</p>
-
-<pre><code>from presets import Preset
-import librosa as _librosa
-librosa = Preset(_librosa)
-librosa['sr'] = 44100
-librosa['n_fft'] = 4096
-librosa['hop_length'] = 1024</code></pre>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">presets</span> <span class="kn">import</span> <span class="n">Preset</span>
+<span class="kn">import</span> <span class="nn">librosa</span> <span class="kn">as</span> <span class="nn">_librosa</span>
+<span class="n">librosa</span> <span class="o">=</span> <span class="n">Preset</span><span class="p">(</span><span class="n">_librosa</span><span class="p">)</span>
+<span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;sr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">44100</span>
+<span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4096</span>
+<span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;hop_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1024</span>
+</pre></div>
 <p>would effectively change the default sampling rate to 44100, and double the frame and hop lengths <code>n_fft</code> and <code>hop_length</code> from their standard default values.  These new defaults would persist throughout your coding session.</p>
 
 </div>
