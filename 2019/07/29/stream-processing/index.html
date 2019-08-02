@@ -25,22 +25,22 @@
 
 
 <meta name="author" content="Brian McFee" />
-<meta name="description" content="This post explains why we decided to make librosa standardize sampling rates on load." />
+<meta name="description" content="This post explains how to process large files with the new block streaming interface." />
 <meta name="keywords" content="">
 
 <meta property="og:site_name" content="librosa blog"/>
-<meta property="og:title" content="Why resample on load?"/>
-<meta property="og:description" content="This post explains why we decided to make librosa standardize sampling rates on load."/>
+<meta property="og:title" content="Streaming for large files"/>
+<meta property="og:description" content="This post explains how to process large files with the new block streaming interface."/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="../../../../2019/07/17/resample-on-load/"/>
+<meta property="og:url" content="../../../../2019/07/29/stream-processing/"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2019-07-17 00:00:00-04:00"/>
+<meta property="article:published_time" content="2019-07-29 00:00:00-04:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="../../../../author/brian-mcfee.html">
 <meta property="article:section" content="blog"/>
 <meta property="og:image" content="/blog/images/librosa_logo.png">
 
-  <title>librosa blog &ndash; Why resample on load?</title>
+  <title>librosa blog &ndash; Streaming for large files</title>
 
 </head>
 <body>
@@ -83,9 +83,9 @@
 <article class="single">
   <header>
       
-    <h1 id="resample-on-load">Why resample on load?</h1>
+    <h1 id="stream-processing">Streaming for large files</h1>
     <p>
-          Posted on Wed 17 July 2019 in <a href="../../../../category/blog.html">blog</a>
+          Posted on Mon 29 July 2019 in <a href="../../../../category/blog.html">blog</a>
 
 
     </p>
@@ -1245,9 +1245,12 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>One of the questions that I get most often has to do with how <code>librosa</code> handles loading of audio data, specifically,</p>
-<p><strong>Why does librosa always resample to 22050 Hz when I load a file?</strong></p>
-<p>This is an entirely reasonable question, and the answer isn't necessarily obvious.  Rather than bury the explanation in the API documentation, I'm putting the explanation here in blog form.</p>
+<p>Librosa was initially designed for processing relatively short fragments of recorded audio, typically not more than a few minutes in duration.
+While this describes most popular music (our initial target application area), it is a poor description of many other forms of audio, particularly
+those encountered in environmental sound and bioacoustics domains.  In those settings, audio signals are commonly of durations on the order of hours if not days or weeks.
+This raises an obvious question:</p>
+<p><strong>How can I process long audio files with librosa?</strong></p>
+<p>This post describes the <em>stream</em> interface adopted in librosa version 0.7, including some background on the overall design of the library and our specific solution to this problem.</p>
 
 </div>
 </div>
@@ -1255,44 +1258,23 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="What-is-a-sampling-rate?">What is a sampling rate?<a class="anchor-link" href="#What-is-a-sampling-rate?">&#182;</a></h2><p>Before diving into the details, we first need to all get on the same page about what a <em>sampling rate</em> is. Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.  The sampling rate --- typically $f_s$ in the digital signal processing literature, or <code>sr</code> in <code>librosa</code> --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples. Equivalently, $f_s$ is the number of <em>observations per second</em> in the discretely sampled signal. It's a basic fact, a <a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem">theorem</a> due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ suffices to reconstruct the signal without introducing <a href="https://en.wikipedia.org/wiki/Aliasing">aliasing</a> artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $f_s/2$ before sampling.</p>
-<p>For a fixed sampling rate $f_s$, a digital signal is represented as a sequence of <em>samples</em>: $y[n]$ (for $n = 0, 1, 2, \dots$), where the $n^\text{th}$ sample corresponds to the value of the signal at time $t = \frac{n}{f_s}$.  This gives a general rule for converting between units of <em>samples</em> and units of <em>time</em>, which is helpful to have in the back of your head when reasoning about software interface design later on.</p>
-<p>Compact discs (remember those?) used a standard sampling rate of 44100 Hz.  This is partly because typical human perception tops out around 20000 Hz (hence $f_s \geq 40000$), and partly due to <a href="https://en.wikipedia.org/wiki/44,100_Hz">historical accidents</a>.  Unlike physical media (CDs), digital audio files (.WAV, .MP3, and so on) can have arbitrary sampling rates. Rates of 16000, 22050, 32000, 44100, and 48000 are all relatively common, and you can't rely on consistency from one file to the next.  Fortunately, sample-rate conversion (or <em>resampling</em>) methods allow us to change the sampling rate of a digital signal as needed.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Why-not-use-the-file's-native-sampling-rate?">Why not use the file's native sampling rate?<a class="anchor-link" href="#Why-not-use-the-file's-native-sampling-rate?">&#182;</a></h2><p>When designing the librosa API, we had a few goals that weren't always necessarily in agreement.</p>
-<p><strong>First</strong>, we wanted it to be relatively simple to use, and have consistent default parameters shared across all functions.  As <a href="https://www.youtube.com/watch?v=eVDDL6tgsv8&amp;t=2406s">Gael Varoquaux</a> reiterated in his keynote at SciPy 2017: consistency, consistency, consistency!  Having standardized default parameters means that a user is less likely to be surprised by unexpected behavior when working with different parts of the library.  This makes the software easier to learn and use.</p>
-<p><strong>Second</strong>, we wanted the default parameters, such as frame length (number of samples in one frame of a short-time Fourier transform), to be expressed naturally.  In audio signal processing, there are two ways this could have gone: either specify the frame length as a duration (in seconds), or as a number of samples.</p>
-<ul>
-<li><p>Expressing frame length as a duration is nice because it uses real, physical units and is independent of the sampling rate: a 1-second frame occupies the same amount of "content", whether the sampling rate is 8000 or 16000 Hz.  However, this would mean that the same function applied to two signals with different sampling rates would produce outputs of different dimensionality, and would therefore not be directly comparable.</p>
-</li>
-<li><p>Expressing frame length as a number of samples, on the other hand, always produces outputs of comparable dimension.  However, the meaning of the contents can change, depending on the sampling rate.  As it turns out, designing for dimensional compatibility is much more convenient when you consider that subsequent processing stages will need to know the dimension of the input data to operate correctly.  It's easier to fix the sampling rate first, and then design around that, than vice versa.</p>
-</li>
-<li><p>Expressing frame length in terms of samples has the added bonus that we can design for efficiently calculable Fourier transforms.  Most fast Fourier transform (FFT) implementations work best when the number of samples is an integral power of 2, and worst when the number is a large prime.  Although the latter case is unlikely in general, defining frames in terms of samples leaves us in a better position to guarantee efficient implementation.</p>
-</li>
-</ul>
-<p><strong>Third</strong>, we wanted to minimize the chance of users (i.e., myself) making simple mistakes by not accounting for the sampling rate.  An analysis script, once written, should behave consistently across different input signals, and not depend strongly on the exact sampling rate.  In practice, this meant that every analysis script involved immediately standardizing the sampling rate of a file after it was loaded, so it made sense to combine the two steps into one (by default) since it's the most common case when dealing with collections of audio.</p>
-<p>After a bit of discussion, we pretty quickly decided that resample-on-load was the best compromise available for achieving consistency and simplicity at the API level.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?">Okay... but why 22050 Hz?  Why not 44100 or 48000?<a class="anchor-link" href="#Okay...-but-why-22050-Hz?--Why-not-44100-or-48000?">&#182;</a></h2><p>It's true: 44100 Hz is essentially the standard for "high (enough) quality" audio storage, and it would have been a sensible default.</p>
-<p>However, we decided for the lower rate of 22050 for two reasons:</p>
+<h2 id="How-does-librosa-work?">How does librosa work?<a class="anchor-link" href="#How-does-librosa-work?">&#182;</a></h2><p>Before getting into the details of how do handle large files, it will help to understand librosa's data model more generally.</p>
+<p>Early in the development of librosa, we made a conscious decision to rely only on <code>numpy</code> datatypes, and not develop a more structured object model.  This decision was motivated by several factors, including but not limited to:</p>
 <ol>
-<li>It cuts down on memory consumption,</li>
-<li>44100 was overkill for our most common tasks.</li>
+<li>ease of implementation,</li>
+<li>ease of use,</li>
+<li>ease of interoperability with other libraries, and</li>
+<li>syntactic similarity to previous MATLAB-based implementations, as well as theoretical (mathematical) definitions.</li>
 </ol>
-<p>The first point is obvious, but the second point deserves a bit more discussion.</p>
-<p>When we were initially developing librosa, our main use cases were analyzing corpora of old jazz recordings, music more generally, and speech signals.  While humans (young ones, anyway) can hear up to around 20000 Hz, it's possible to successfully analyze music and speech data at much lower rates without sacrificing much.  The highest pitches we usually care about detecting are around $C_9 \approx 8372~\text{Hz}$, well below the 11025 cutoff implied by $f_s = 22050$.  There's certainly content above 11025 Hz, but it often turns out to be noisy or redundant with the lower parts of the spectrum, and not so informative for semantic analysis tasks like instrument classification, rhythm analysis, chord recognition, and so on.</p>
+<p>What this means, is that rather than having object-oriented code like:</p>
+<div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">not_librosa</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><span class="n">some</span> <span class="n">parameters</span><span class="p">)</span>  <span class="c1"># an object of type not_librosa.Audio</span>
+<span class="n">melspec</span> <span class="o">=</span> <span class="n">not_librosa</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># an object of type not_librosa.feature.MelSpectrogram</span>
+</pre></div>
+<p>you instead get a more procedural style:</p>
+<div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">some</span> <span class="n">parameters</span><span class="p">)</span>  <span class="c1"># a numpy array</span>
+<span class="n">melspec</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">melspectrogram</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>  <span class="c1"># another numpy array</span>
+</pre></div>
+<p>As a result, it's fairly easy to move data out of librosa and into other python packages: <code>theano</code> and <code>scikit-learn</code> were prime targets back in 2012, these days it's more about tensorflow or pytorch, but the principle is the same.  Having our own object interface to audio and features would get in the way, even if it would have made some design choices easier.</p>
 
 </div>
 </div>
@@ -1300,20 +1282,8 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="I-still-don't-like-it.--What-can-I-do?">I still don't like it.  What can I do?<a class="anchor-link" href="#I-still-don't-like-it.--What-can-I-do?">&#182;</a></h2><p>Sure, 22050 isn't right for every situation.  It's a default setting, but not a requirement!</p>
-<p>You have a few options though.  First, you can always bypass resample-on-load by specifying <code>sr=None</code>:</p>
-<div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-<p>You will need to remember to pass <code>sr</code> around to all relevant functions, and make sure your frame and hop lengths are tuned accordingly.</p>
-<p>A slightly fancier alternative is to use the <code>presets</code> package, as illustrated in the <a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py">example gallery</a> to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like <code>librosa</code>, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific <code>sr</code> value around with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">presets</span> <span class="kn">import</span> <span class="n">Preset</span>
-<span class="kn">import</span> <span class="nn">librosa</span> <span class="kn">as</span> <span class="nn">_librosa</span>
-<span class="n">librosa</span> <span class="o">=</span> <span class="n">Preset</span><span class="p">(</span><span class="n">_librosa</span><span class="p">)</span>
-<span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;sr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">44100</span>
-<span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4096</span>
-<span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;hop_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1024</span>
-</pre></div>
-<p>would effectively change the default sampling rate to 44100, and double the frame and hop lengths <code>n_fft</code> and <code>hop_length</code> from their standard default values.  These new defaults would persist throughout your coding session.</p>
+<h2 id="What's-the-problem-with-large-files?">What's the problem with large files?<a class="anchor-link" href="#What's-the-problem-with-large-files?">&#182;</a></h2><p>Both approaches (objective and procedural) described above have their pros and cons.  The pros of the procedural approach are listed above, but one of the drawbacks that we inherit from <code>numpy</code> is that the entire input <code>y</code> must be constructed before <code>melspec</code> can be produced.  This is ultimately a limitation of the <a href="https://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html"><code>numpy.ndarray</code> type</a>, which is explicitly designed as a container for fixed-length, contiguous regions of memory with consistent underlying data types (eg <code>int</code> or <code>float</code>).  For short recordings --- our most common case in librosa --- this is fine: recordings typically fit in memory and are known in advance.  However, when the audio you want to analyze is long (e.g., hours) or streaming from a recording device, <code>ndarray</code> is not an appropriate container type.  We knew this in 2012, but decided to optimize for the common case and deal with the fallout later.</p>
+<p>Now, if we had gone for an objective interface, we could have handled these problems in a variety of ways.  For instance, it would have been easy to abstract away time-indexing logic so that data is only loaded when it's requested, eg <code>Audio.get_buffer(time=SOME_NUMBER, duration=SOME_NUMBER)</code>.  Or we could have used the object's internal state to maintain a buffer in memory, but not load the entire recording from storage, and provide an interface to <em>seek</em> to a specific time position in the signal.  Various other libraries implement these kinds of solutions, and they can work great!  But they do come with a bit of additional interface complexity, and can limit inter-operability.</p>
 
 </div>
 </div>
@@ -1321,7 +1291,90 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Resample-on-load was ultimately a usability choice.  We felt that the initial computational effort at load time was a worthy trade-off if it could simplify software usage without sacrificing accuracy or quality in the most common cases.</p>
+<h2 id="Streaming-and-generators">Streaming and generators<a class="anchor-link" href="#Streaming-and-generators">&#182;</a></h2><p>The solution that we ultimately went with in version 0.7 is to use python <a href="https://wiki.python.org/moin/Generators">generators</a>.  Rather than load the entire signal at once, we rely on <a href="https://github.com/bastibe/SoundFile">soundfile</a> to produce a <em>sequence</em> of fragments of the signal, which are then passed back to the user.  At a high level, we'd like to have an interface of the form:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">librosa</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">some_parameters</span><span class="p">):</span>
+    <span class="n">some_function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+<p>where <code>y</code> now refers to a short excerpt of the much longer recording in question.  This raises a few more questions though:</p>
+<ol>
+<li>How big of an excerpt should we use?</li>
+<li>How do two neighboring excerpts relate to each-other?</li>
+<li>Can this be used with every function in librosa?</li>
+</ol>
+<p>To dig into those, we'll have to think a bit more about how librosa represents data.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Samples,-frames,-and-blocks">Samples, frames, and blocks<a class="anchor-link" href="#Samples,-frames,-and-blocks">&#182;</a></h2><p>An audio buffer <code>y</code> is typically viewed as a sequence of discrete <em>samples</em> <code>y[0], y[1], y[2], ...</code>.
+Most audio analyses operate at the level of <em>frames</em> of audio, for instance, taking <code>y[0] ... y[2047]</code> as one frame, followed by <code>y[512] ... y[2047 + 512]</code>, and so on.
+Each frame here consists of exactly 2048 samples, and the time difference from one frame to the next is always 512 samples.  (These are just the default parameters, of course.)</p>
+<p>For most analyses, e.g. those based on the <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform">short-time Fourier transform</a>, frames are modeled independently from one another.
+This means that it would be completely valid to process one frame entirely before moving on to the next, and indeed, many implementations operate in exactly this fashion.
+However, this can also be <strong>inefficient</strong> because it makes poor use of memory locality, as well as data- and algorithm-parallelism.
+It is generally more efficient, especially in Python/numpy, to operate on multiple frames simultaneously.  This naturally incurs some latency while buffering data, but the end-result leads to improved throughput.</p>
+<p>Now, a naive solution here would be to simply load a relatively long fragment <code>y</code> consisting of multiple frames, and process them in parallel before moving on to the next fragment.
+The tricky part is handling the boundaries correctly.  If the <em>hop length</em> (number of samples between frames) is identical to the <em>frame length</em> (number of samples in each frame), then frames do not overlap, and we won't get into trouble processing data in this way.  However, if frames can overlap in time, then so should the longer fragments if we're to get the same answer at the end of the day.  This is where we need to be a bit careful.</p>
+<h3 id="Blocks">Blocks<a class="anchor-link" href="#Blocks">&#182;</a></h3><p>The solution we adopted in librosa 0.7 is the notion of a <em>block</em>, which is defined in terms of the number of <em>frames</em>, the <em>frame length</em> and the <em>hop length</em> between frames.  Blocks overlap in exactly the same way that frames would normally: by <code>frame length - hop_length</code> samples.</p>
+<p>To make this concrete, imagine that we have a frame length of 100 samples, a hop length of 25 samples, and a block size of 3 frames.  The first few frames would look as follows:</p>
+<ul>
+<li><code>y[0:100]</code></li>
+<li><code>y[25:125]</code></li>
+<li><code>y[50:150]</code></li>
+<li><code>y[75:175]</code></li>
+<li><code>y[100:200]</code></li>
+<li><code>y[125:225]</code></li>
+</ul>
+<p>The first block then covers samples <code>y[0:150]</code>.  The second block covers samples <code>y[75:225]</code>, and so on.  The result here is that each frame belongs to exactly one block (and appears exactly once), but any given <em>sample</em> can occur in multiple blocks.</p>
+<p>The block interface is provided by the new <a href="https://librosa.github.io/librosa/generated/librosa.core.stream.html?highlight=stream#librosa.core.stream"><code>librosa.stream</code></a> function, which is used as follows:</p>
+<div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">example_audio_file</span><span class="p">()</span>
+<span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">stream</span> <span class="n">librosa</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>
+                         <span class="n">block_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+                         <span class="n">frame_length</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+                         <span class="n">hop_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">y_block</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="c1"># Process y_block</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Details">Details<a class="anchor-link" href="#Details">&#182;</a></h2><p>There are a few things to be aware of when using stream processing librosa.</p>
+<p>First, following on our <a href="https://librosa.github.io/blog/2019/07/17/resample-on-load/#resample-on-load">previous post</a>, <code>librosa.load</code> will (by default) resample the input signal to a given sampling rate.  However, this resampling operation needs access to the full signal (or at least quite a bit of the future) to work well, so resample-on-load is not supported in streaming.  Practically, this means that you'll need to be aware of your sampling rate and analysis parameters in advance, and be sure to carry them over across all downstream processing.</p>
+<p>Second, librosa's analyses are frame-centered by default.  This means that when you compute, say, <code>D = librosa.stft(y)</code>, the <code>k</code>th column <code>D[:, k]</code> covers a frame which centered around sample <code>y[k * hop_length]</code>.  To do this, the signal is padded on the left (and right) so that <code>D[:, 0]</code> is centered at sample <code>y[0]</code>.  This will cause trouble if you call <code>librosa.stft(y_block)</code>, since the beginning (and end) of each block will be padded, and they would not have been padded had the entire sequence been provided to <code>stft</code> at once.  Consequently, librosa does not support frame-centered analysis in streaming mode: frames are assumed to <em>start</em> at sample <code>y[k * hop_length]</code> rather than be centered around them.</p>
+<p>As a general rule, always remember to include <code>center=False</code> when doing stream-based analysis:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">y_block</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="n">D_block</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="n">y_block</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+<p>and of course, be sure to match the frame and hop lengths to your block parameters.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="What-does-and-does-not-work?">What does and does not work?<a class="anchor-link" href="#What-does-and-does-not-work?">&#182;</a></h2><p>Not all analyses support stream processing.  For instance, anything that requires total knowledge of a sequence, such as <a href="https://librosa.github.io/librosa/generated/librosa.segment.recurrence_matrix.html#librosa.segment.recurrence_matrix">recurrence matrix</a> generation, will clearly not work.  A bit more subtle are methods that rely on resampling, such as <code>librosa.cqt</code>.</p>
+<p>However, any STFT-based analysis (such as most of the <code>librosa.feature</code> module) should work fine, and this already covers a large chunk of use-cases.</p>
+<p>The <a href="https://librosa.github.io/librosa/auto_examples/plot_pcen_stream.html#sphx-glr-auto-examples-plot-pcen-stream-py">example gallery</a> includes a notebook demonstrating how to do stream-based processing with STFT and <a href="https://librosa.github.io/librosa/generated/librosa.core.pcen.html?highlight=pcen#librosa.core.pcen">pcen</a> normalization.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Block-based processing allows some, but not all of librosa's functionality to apply easily to large audio files.</p>
+<p>While in principle this could also be applied to online streaming from live recording devices, we don't yet have a stable underlying implementation to rely upon for this, and hesitate to make any general recommendations.</p>
+<p>If at some point in the future, streaming sample rate conversion becomes viable, we'll look at relaxing some of the constraints around resampling (e.g., on load or within <code>cqt</code>).</p>
 
 </div>
 </div>

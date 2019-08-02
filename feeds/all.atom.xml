@@ -1,5 +1,1321 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>librosa blog</title><link href="https://librosa.github.io/blog/" rel="alternate"></link><link href="https://librosa.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>https://librosa.github.io/blog/</id><updated>2019-07-17T00:00:00-04:00</updated><subtitle>&lt;code&gt; import &lt;span style="color: pink"&gt;librosa&lt;/span&gt; &lt;/code&gt;</subtitle><entry><title>Why resample on load?</title><link href="https://librosa.github.io/blog/2019/07/17/resample-on-load/" rel="alternate"></link><published>2019-07-17T00:00:00-04:00</published><updated>2019-07-17T00:00:00-04:00</updated><author><name>Brian McFee</name></author><id>tag:librosa.github.io,2019-07-17:/blog/2019/07/17/resample-on-load/</id><summary type="html">&lt;p&gt;This post explains why we decided to make librosa standardize sampling rates on load.&lt;/p&gt;</summary><content type="html">&lt;style type="text/css"&gt;/*!
+<feed xmlns="http://www.w3.org/2005/Atom"><title>librosa blog</title><link href="https://librosa.github.io/blog/" rel="alternate"></link><link href="https://librosa.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>https://librosa.github.io/blog/</id><updated>2019-07-29T00:00:00-04:00</updated><subtitle>&lt;code&gt; import &lt;span style="color: pink"&gt;librosa&lt;/span&gt; &lt;/code&gt;</subtitle><entry><title>Streaming for large files</title><link href="https://librosa.github.io/blog/2019/07/29/stream-processing/" rel="alternate"></link><published>2019-07-29T00:00:00-04:00</published><updated>2019-07-29T00:00:00-04:00</updated><author><name>Brian McFee</name></author><id>tag:librosa.github.io,2019-07-29:/blog/2019/07/29/stream-processing/</id><summary type="html">&lt;p&gt;This post explains how to process large files with the new block streaming interface.&lt;/p&gt;</summary><content type="html">&lt;style type="text/css"&gt;/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell &gt; div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area &gt; div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area &gt; div.highlight &gt; pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the &lt;head&gt; if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev &lt;Maniac@SoftwareManiacs.Org&gt;
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph &gt; img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell &gt; div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+&lt;/style&gt;
+&lt;style type="text/css"&gt;.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */&lt;/style&gt;
+&lt;style type="text/css"&gt;
+/* Temporary definitions which will become obsolete with Notebook release 5.0 */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+&lt;/style&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Librosa was initially designed for processing relatively short fragments of recorded audio, typically not more than a few minutes in duration.
+While this describes most popular music (our initial target application area), it is a poor description of many other forms of audio, particularly
+those encountered in environmental sound and bioacoustics domains.  In those settings, audio signals are commonly of durations on the order of hours if not days or weeks.
+This raises an obvious question:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How can I process long audio files with librosa?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This post describes the &lt;em&gt;stream&lt;/em&gt; interface adopted in librosa version 0.7, including some background on the overall design of the library and our specific solution to this problem.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="How-does-librosa-work?"&gt;How does librosa work?&lt;a class="anchor-link" href="#How-does-librosa-work?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Before getting into the details of how do handle large files, it will help to understand librosa's data model more generally.&lt;/p&gt;
+&lt;p&gt;Early in the development of librosa, we made a conscious decision to rely only on &lt;code&gt;numpy&lt;/code&gt; datatypes, and not develop a more structured object model.  This decision was motivated by several factors, including but not limited to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;ease of implementation,&lt;/li&gt;
+&lt;li&gt;ease of use,&lt;/li&gt;
+&lt;li&gt;ease of interoperability with other libraries, and&lt;/li&gt;
+&lt;li&gt;syntactic similarity to previous MATLAB-based implementations, as well as theoretical (mathematical) definitions.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;What this means, is that rather than having object-oriented code like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;not_librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Audio&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;some&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# an object of type not_librosa.Audio&lt;/span&gt;
+&lt;span class="n"&gt;melspec&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;not_librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;feature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MelSpectrogram&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# an object of type not_librosa.feature.MelSpectrogram&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;you instead get a more procedural style:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;some&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# a numpy array&lt;/span&gt;
+&lt;span class="n"&gt;melspec&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;feature&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;melspectrogram&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# another numpy array&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;As a result, it's fairly easy to move data out of librosa and into other python packages: &lt;code&gt;theano&lt;/code&gt; and &lt;code&gt;scikit-learn&lt;/code&gt; were prime targets back in 2012, these days it's more about tensorflow or pytorch, but the principle is the same.  Having our own object interface to audio and features would get in the way, even if it would have made some design choices easier.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="What's-the-problem-with-large-files?"&gt;What's the problem with large files?&lt;a class="anchor-link" href="#What's-the-problem-with-large-files?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Both approaches (objective and procedural) described above have their pros and cons.  The pros of the procedural approach are listed above, but one of the drawbacks that we inherit from &lt;code&gt;numpy&lt;/code&gt; is that the entire input &lt;code&gt;y&lt;/code&gt; must be constructed before &lt;code&gt;melspec&lt;/code&gt; can be produced.  This is ultimately a limitation of the &lt;a href="https://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html"&gt;&lt;code&gt;numpy.ndarray&lt;/code&gt; type&lt;/a&gt;, which is explicitly designed as a container for fixed-length, contiguous regions of memory with consistent underlying data types (eg &lt;code&gt;int&lt;/code&gt; or &lt;code&gt;float&lt;/code&gt;).  For short recordings --- our most common case in librosa --- this is fine: recordings typically fit in memory and are known in advance.  However, when the audio you want to analyze is long (e.g., hours) or streaming from a recording device, &lt;code&gt;ndarray&lt;/code&gt; is not an appropriate container type.  We knew this in 2012, but decided to optimize for the common case and deal with the fallout later.&lt;/p&gt;
+&lt;p&gt;Now, if we had gone for an objective interface, we could have handled these problems in a variety of ways.  For instance, it would have been easy to abstract away time-indexing logic so that data is only loaded when it's requested, eg &lt;code&gt;Audio.get_buffer(time=SOME_NUMBER, duration=SOME_NUMBER)&lt;/code&gt;.  Or we could have used the object's internal state to maintain a buffer in memory, but not load the entire recording from storage, and provide an interface to &lt;em&gt;seek&lt;/em&gt; to a specific time position in the signal.  Various other libraries implement these kinds of solutions, and they can work great!  But they do come with a bit of additional interface complexity, and can limit inter-operability.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Streaming-and-generators"&gt;Streaming and generators&lt;a class="anchor-link" href="#Streaming-and-generators"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The solution that we ultimately went with in version 0.7 is to use python &lt;a href="https://wiki.python.org/moin/Generators"&gt;generators&lt;/a&gt;.  Rather than load the entire signal at once, we rely on &lt;a href="https://github.com/bastibe/SoundFile"&gt;soundfile&lt;/a&gt; to produce a &lt;em&gt;sequence&lt;/em&gt; of fragments of the signal, which are then passed back to the user.  At a high level, we'd like to have an interface of the form:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stream&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;some_parameters&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;some_function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;where &lt;code&gt;y&lt;/code&gt; now refers to a short excerpt of the much longer recording in question.  This raises a few more questions though:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;How big of an excerpt should we use?&lt;/li&gt;
+&lt;li&gt;How do two neighboring excerpts relate to each-other?&lt;/li&gt;
+&lt;li&gt;Can this be used with every function in librosa?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To dig into those, we'll have to think a bit more about how librosa represents data.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Samples,-frames,-and-blocks"&gt;Samples, frames, and blocks&lt;a class="anchor-link" href="#Samples,-frames,-and-blocks"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;An audio buffer &lt;code&gt;y&lt;/code&gt; is typically viewed as a sequence of discrete &lt;em&gt;samples&lt;/em&gt; &lt;code&gt;y[0], y[1], y[2], ...&lt;/code&gt;.
+Most audio analyses operate at the level of &lt;em&gt;frames&lt;/em&gt; of audio, for instance, taking &lt;code&gt;y[0] ... y[2047]&lt;/code&gt; as one frame, followed by &lt;code&gt;y[512] ... y[2047 + 512]&lt;/code&gt;, and so on.
+Each frame here consists of exactly 2048 samples, and the time difference from one frame to the next is always 512 samples.  (These are just the default parameters, of course.)&lt;/p&gt;
+&lt;p&gt;For most analyses, e.g. those based on the &lt;a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform"&gt;short-time Fourier transform&lt;/a&gt;, frames are modeled independently from one another.
+This means that it would be completely valid to process one frame entirely before moving on to the next, and indeed, many implementations operate in exactly this fashion.
+However, this can also be &lt;strong&gt;inefficient&lt;/strong&gt; because it makes poor use of memory locality, as well as data- and algorithm-parallelism.
+It is generally more efficient, especially in Python/numpy, to operate on multiple frames simultaneously.  This naturally incurs some latency while buffering data, but the end-result leads to improved throughput.&lt;/p&gt;
+&lt;p&gt;Now, a naive solution here would be to simply load a relatively long fragment &lt;code&gt;y&lt;/code&gt; consisting of multiple frames, and process them in parallel before moving on to the next fragment.
+The tricky part is handling the boundaries correctly.  If the &lt;em&gt;hop length&lt;/em&gt; (number of samples between frames) is identical to the &lt;em&gt;frame length&lt;/em&gt; (number of samples in each frame), then frames do not overlap, and we won't get into trouble processing data in this way.  However, if frames can overlap in time, then so should the longer fragments if we're to get the same answer at the end of the day.  This is where we need to be a bit careful.&lt;/p&gt;
+&lt;h3 id="Blocks"&gt;Blocks&lt;a class="anchor-link" href="#Blocks"&gt;&amp;#182;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The solution we adopted in librosa 0.7 is the notion of a &lt;em&gt;block&lt;/em&gt;, which is defined in terms of the number of &lt;em&gt;frames&lt;/em&gt;, the &lt;em&gt;frame length&lt;/em&gt; and the &lt;em&gt;hop length&lt;/em&gt; between frames.  Blocks overlap in exactly the same way that frames would normally: by &lt;code&gt;frame length - hop_length&lt;/code&gt; samples.&lt;/p&gt;
+&lt;p&gt;To make this concrete, imagine that we have a frame length of 100 samples, a hop length of 25 samples, and a block size of 3 frames.  The first few frames would look as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;y[0:100]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y[25:125]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y[50:150]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y[75:175]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y[100:200]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;y[125:225]&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The first block then covers samples &lt;code&gt;y[0:150]&lt;/code&gt;.  The second block covers samples &lt;code&gt;y[75:225]&lt;/code&gt;, and so on.  The result here is that each frame belongs to exactly one block (and appears exactly once), but any given &lt;em&gt;sample&lt;/em&gt; can occur in multiple blocks.&lt;/p&gt;
+&lt;p&gt;The block interface is provided by the new &lt;a href="https://librosa.github.io/librosa/generated/librosa.core.stream.html?highlight=stream#librosa.core.stream"&gt;&lt;code&gt;librosa.stream&lt;/code&gt;&lt;/a&gt; function, which is used as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;util&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;example_audio_file&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;sr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_samplerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;stream&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stream&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="n"&gt;block_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="n"&gt;frame_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="n"&gt;hop_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;y_block&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;stream&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="c1"&gt;# Process y_block&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Details"&gt;Details&lt;a class="anchor-link" href="#Details"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;There are a few things to be aware of when using stream processing librosa.&lt;/p&gt;
+&lt;p&gt;First, following on our &lt;a href="https://librosa.github.io/blog/2019/07/17/resample-on-load/#resample-on-load"&gt;previous post&lt;/a&gt;, &lt;code&gt;librosa.load&lt;/code&gt; will (by default) resample the input signal to a given sampling rate.  However, this resampling operation needs access to the full signal (or at least quite a bit of the future) to work well, so resample-on-load is not supported in streaming.  Practically, this means that you'll need to be aware of your sampling rate and analysis parameters in advance, and be sure to carry them over across all downstream processing.&lt;/p&gt;
+&lt;p&gt;Second, librosa's analyses are frame-centered by default.  This means that when you compute, say, &lt;code&gt;D = librosa.stft(y)&lt;/code&gt;, the &lt;code&gt;k&lt;/code&gt;th column &lt;code&gt;D[:, k]&lt;/code&gt; covers a frame which centered around sample &lt;code&gt;y[k * hop_length]&lt;/code&gt;.  To do this, the signal is padded on the left (and right) so that &lt;code&gt;D[:, 0]&lt;/code&gt; is centered at sample &lt;code&gt;y[0]&lt;/code&gt;.  This will cause trouble if you call &lt;code&gt;librosa.stft(y_block)&lt;/code&gt;, since the beginning (and end) of each block will be padded, and they would not have been padded had the entire sequence been provided to &lt;code&gt;stft&lt;/code&gt; at once.  Consequently, librosa does not support frame-centered analysis in streaming mode: frames are assumed to &lt;em&gt;start&lt;/em&gt; at sample &lt;code&gt;y[k * hop_length]&lt;/code&gt; rather than be centered around them.&lt;/p&gt;
+&lt;p&gt;As a general rule, always remember to include &lt;code&gt;center=False&lt;/code&gt; when doing stream-based analysis:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;y_block&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;stream&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;D_block&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stft&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_block&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n_fft&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;hop_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;center&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and of course, be sure to match the frame and hop lengths to your block parameters.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="What-does-and-does-not-work?"&gt;What does and does not work?&lt;a class="anchor-link" href="#What-does-and-does-not-work?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Not all analyses support stream processing.  For instance, anything that requires total knowledge of a sequence, such as &lt;a href="https://librosa.github.io/librosa/generated/librosa.segment.recurrence_matrix.html#librosa.segment.recurrence_matrix"&gt;recurrence matrix&lt;/a&gt; generation, will clearly not work.  A bit more subtle are methods that rely on resampling, such as &lt;code&gt;librosa.cqt&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;However, any STFT-based analysis (such as most of the &lt;code&gt;librosa.feature&lt;/code&gt; module) should work fine, and this already covers a large chunk of use-cases.&lt;/p&gt;
+&lt;p&gt;The &lt;a href="https://librosa.github.io/librosa/auto_examples/plot_pcen_stream.html#sphx-glr-auto-examples-plot-pcen-stream-py"&gt;example gallery&lt;/a&gt; includes a notebook demonstrating how to do stream-based processing with STFT and &lt;a href="https://librosa.github.io/librosa/generated/librosa.core.pcen.html?highlight=pcen#librosa.core.pcen"&gt;pcen&lt;/a&gt; normalization.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Summary"&gt;Summary&lt;a class="anchor-link" href="#Summary"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Block-based processing allows some, but not all of librosa's functionality to apply easily to large audio files.&lt;/p&gt;
+&lt;p&gt;While in principle this could also be applied to online streaming from live recording devices, we don't yet have a stable underlying implementation to rely upon for this, and hesitate to make any general recommendations.&lt;/p&gt;
+&lt;p&gt;If at some point in the future, streaming sample rate conversion becomes viable, we'll look at relaxing some of the constraints around resampling (e.g., on load or within &lt;code&gt;cqt&lt;/code&gt;).&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+ 
+
+
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content></entry><entry><title>Why resample on load?</title><link href="https://librosa.github.io/blog/2019/07/17/resample-on-load/" rel="alternate"></link><published>2019-07-17T00:00:00-04:00</published><updated>2019-07-17T00:00:00-04:00</updated><author><name>Brian McFee</name></author><id>tag:librosa.github.io,2019-07-17:/blog/2019/07/17/resample-on-load/</id><summary type="html">&lt;p&gt;This post explains why we decided to make librosa standardize sampling rates on load.&lt;/p&gt;</summary><content type="html">&lt;style type="text/css"&gt;/*!
 *
 * IPython notebook
 *
@@ -1161,7 +2477,7 @@ h6:hover .anchor-link {
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;&lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="What-is-a-sampling-rate?"&gt;What is a sampling rate?&lt;a class="anchor-link" href="#What-is-a-sampling-rate?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Before diving into the details, we first need to all get on the same page about what a &lt;em&gt;sampling rate&lt;/em&gt; is. Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.  The sampling rate --- typically $f_s$ in the digital signal processing literature, or &lt;code&gt;sr&lt;/code&gt; in &lt;code&gt;librosa&lt;/code&gt; --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples. Equivalently, $f_s$ is the number of &lt;em&gt;observations per second&lt;/em&gt; in the discretely sampled signal. It's a basic fact, a &lt;a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem"&gt;theorem&lt;/a&gt; due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ sufficies to reconstruct the signal without introducing &lt;a href="https://en.wikipedia.org/wiki/Aliasing"&gt;aliasing&lt;/a&gt; artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $f_s/2$ before sampling.&lt;/p&gt;
+&lt;h2 id="What-is-a-sampling-rate?"&gt;What is a sampling rate?&lt;a class="anchor-link" href="#What-is-a-sampling-rate?"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Before diving into the details, we first need to all get on the same page about what a &lt;em&gt;sampling rate&lt;/em&gt; is. Audio in the real world happens in continuous time, but computers don't have infinite precision, so we approximate continuous signals by collections of discrete samples.  The sampling rate --- typically $f_s$ in the digital signal processing literature, or &lt;code&gt;sr&lt;/code&gt; in &lt;code&gt;librosa&lt;/code&gt; --- is defined as $1/t_s$, where $t_s$ is the amount of time (in seconds) between successive samples. Equivalently, $f_s$ is the number of &lt;em&gt;observations per second&lt;/em&gt; in the discretely sampled signal. It's a basic fact, a &lt;a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem"&gt;theorem&lt;/a&gt; due to Nyquist and Shannon, that if a continuous signal has no content above some frequency $f$, then a sampling rate $f_s \geq 2f$ suffices to reconstruct the signal without introducing &lt;a href="https://en.wikipedia.org/wiki/Aliasing"&gt;aliasing&lt;/a&gt; artifacts.  Typically we go the other way: fix a sampling rate $f_s$, and then filter the signal to eliminate any content above $f_s/2$ before sampling.&lt;/p&gt;
 &lt;p&gt;For a fixed sampling rate $f_s$, a digital signal is represented as a sequence of &lt;em&gt;samples&lt;/em&gt;: $y[n]$ (for $n = 0, 1, 2, \dots$), where the $n^\text{th}$ sample corresponds to the value of the signal at time $t = \frac{n}{f_s}$.  This gives a general rule for converting between units of &lt;em&gt;samples&lt;/em&gt; and units of &lt;em&gt;time&lt;/em&gt;, which is helpful to have in the back of your head when reasoning about software interface design later on.&lt;/p&gt;
 &lt;p&gt;Compact discs (remember those?) used a standard sampling rate of 44100 Hz.  This is partly because typical human perception tops out around 20000 Hz (hence $f_s \geq 40000$), and partly due to &lt;a href="https://en.wikipedia.org/wiki/44,100_Hz"&gt;historical accidents&lt;/a&gt;.  Unlike physical media (CDs), digital audio files (.WAV, .MP3, and so on) can have arbitrary sampling rates. Rates of 16000, 22050, 32000, 44100, and 48000 are all relatively common, and you can't rely on consistency from one file to the next.  Fortunately, sample-rate conversion (or &lt;em&gt;resampling&lt;/em&gt;) methods allow us to change the sampling rate of a digital signal as needed.&lt;/p&gt;
 
@@ -1198,7 +2514,7 @@ h6:hover .anchor-link {
 &lt;li&gt;44100 was overkill for our most common tasks.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;The first point is obvious, but the second point deserves a bit more discussion.&lt;/p&gt;
-&lt;p&gt;When we were initially developing librosa, our main use cases were analyzing corpora of old jazz recordings, music more generally, and speech signals.  While humans (young ones, anyway) can hear up to around 20000 Hz, it's possible to successfully analyze music and speech data at much lower rates without sacrificing much.  The highest pithces we usually care about detecting are around $C_9 \approx 8372~\text{Hz}$, well below the 11025 cutoff implied by $f_s = 22050$.  There's certainly content above 11025 Hz, but it often turns out to be noisy or redundant with the lower parts of the spectrum, and not so informative for semantic analysis tasks like instrument classification, rhythm analysis, chord recognition, and so on.&lt;/p&gt;
+&lt;p&gt;When we were initially developing librosa, our main use cases were analyzing corpora of old jazz recordings, music more generally, and speech signals.  While humans (young ones, anyway) can hear up to around 20000 Hz, it's possible to successfully analyze music and speech data at much lower rates without sacrificing much.  The highest pitches we usually care about detecting are around $C_9 \approx 8372~\text{Hz}$, well below the 11025 cutoff implied by $f_s = 22050$.  There's certainly content above 11025 Hz, but it often turns out to be noisy or redundant with the lower parts of the spectrum, and not so informative for semantic analysis tasks like instrument classification, rhythm analysis, chord recognition, and so on.&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1211,7 +2527,7 @@ h6:hover .anchor-link {
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;librosa&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;You will need to remember to pass &lt;code&gt;sr&lt;/code&gt; around to all relevant functions, and make sure your frame and hop lengths are tuned accordingly.&lt;/p&gt;
-&lt;p&gt;A slightly fancier alternative is to use the &lt;code&gt;presets&lt;/code&gt; package, as illustrated in the &lt;a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py"&gt;example gallery&lt;/a&gt; to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like &lt;code&gt;librosa&lt;/code&gt;, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific &lt;code&gt;sr&lt;/code&gt; value aruond with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:&lt;/p&gt;
+&lt;p&gt;A slightly fancier alternative is to use the &lt;code&gt;presets&lt;/code&gt; package, as illustrated in the &lt;a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py"&gt;example gallery&lt;/a&gt; to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like &lt;code&gt;librosa&lt;/code&gt;, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific &lt;code&gt;sr&lt;/code&gt; value around with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;presets&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Preset&lt;/span&gt;
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;librosa&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;_librosa&lt;/span&gt;
 &lt;span class="n"&gt;librosa&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Preset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_librosa&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
