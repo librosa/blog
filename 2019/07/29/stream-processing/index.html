@@ -1247,8 +1247,8 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Librosa was initially designed for processing relatively short fragments of recorded audio, typically not more than a few minutes in duration.
 While this describes most popular music (our initial target application area), it is a poor description of many other forms of audio, particularly
-those encountered in environmental sound and bioacoustics domains.  In those settings, audio signals are commonly of durations on the order of hours if not days or weeks.
-This raises an obvious question:</p>
+those encountered in bioacoustics and environmental acoustics.  In those settings, audio signals are commonly of durations on the order of multiple hours, if not days or weeks.
+This fact raises an immediate question:</p>
 <p><strong>How can I process long audio files with librosa?</strong></p>
 <p>This post describes the <em>stream</em> interface adopted in librosa version 0.7, including some background on the overall design of the library and our specific solution to this problem.</p>
 
@@ -1274,7 +1274,7 @@ This raises an obvious question:</p>
 <div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">some</span> <span class="n">parameters</span><span class="p">)</span>  <span class="c1"># a numpy array</span>
 <span class="n">melspec</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">melspectrogram</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>  <span class="c1"># another numpy array</span>
 </pre></div>
-<p>As a result, it's fairly easy to move data out of librosa and into other python packages: <code>theano</code> and <code>scikit-learn</code> were prime targets back in 2012, these days it's more about tensorflow or pytorch, but the principle is the same.  Having our own object interface to audio and features would get in the way, even if it would have made some design choices easier.</p>
+<p>As a result, it's fairly easy to move data out of librosa and into other python packages. Back in 2012, <code>theano</code> and <code>scikit-learn</code> were prime targets back in 2012. These days, it's more about tensorflow or pytorch, but the principle is the same.  Having our own object interface to audio and features would get in the way, even if it would have made some design choices easier.</p>
 
 </div>
 </div>
@@ -1283,7 +1283,7 @@ This raises an obvious question:</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="What's-the-problem-with-large-files?">What's the problem with large files?<a class="anchor-link" href="#What's-the-problem-with-large-files?">&#182;</a></h2><p>Both approaches (objective and procedural) described above have their pros and cons.  The pros of the procedural approach are listed above, but one of the drawbacks that we inherit from <code>numpy</code> is that the entire input <code>y</code> must be constructed before <code>melspec</code> can be produced.  This is ultimately a limitation of the <a href="https://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html"><code>numpy.ndarray</code> type</a>, which is explicitly designed as a container for fixed-length, contiguous regions of memory with consistent underlying data types (eg <code>int</code> or <code>float</code>).  For short recordings --- our most common case in librosa --- this is fine: recordings typically fit in memory and are known in advance.  However, when the audio you want to analyze is long (e.g., hours) or streaming from a recording device, <code>ndarray</code> is not an appropriate container type.  We knew this in 2012, but decided to optimize for the common case and deal with the fallout later.</p>
-<p>Now, if we had gone for an objective interface, we could have handled these problems in a variety of ways.  For instance, it would have been easy to abstract away time-indexing logic so that data is only loaded when it's requested, eg <code>Audio.get_buffer(time=SOME_NUMBER, duration=SOME_NUMBER)</code>.  Or we could have used the object's internal state to maintain a buffer in memory, but not load the entire recording from storage, and provide an interface to <em>seek</em> to a specific time position in the signal.  Various other libraries implement these kinds of solutions, and they can work great!  But they do come with a bit of additional interface complexity, and can limit inter-operability.</p>
+<p>Now, if we had gone for an objective interface, we could have handled these problems in a variety of ways.  For instance, it would have been easy to abstract away time-indexing logic so that data is only loaded when it's requested, eg <code>Audio.get_buffer(time=SOME_NUMBER, duration=SOME_NUMBER)</code>.  Or we could have used the object's internal state to maintain a buffer in memory, but not load the entire recording from storage, and provide an interface to <em>seek</em> to a specific time position in the signal.  Various other libraries implement these kinds of solutions, and they can work great!  But they do come with a bit of additional interface complexity, and might limit interoperability.</p>
 
 </div>
 </div>
@@ -1291,18 +1291,18 @@ This raises an obvious question:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Streaming-and-generators">Streaming and generators<a class="anchor-link" href="#Streaming-and-generators">&#182;</a></h2><p>The solution that we ultimately went with in version 0.7 is to use python <a href="https://wiki.python.org/moin/Generators">generators</a>.  Rather than load the entire signal at once, we rely on <a href="https://github.com/bastibe/SoundFile">soundfile</a> to produce a <em>sequence</em> of fragments of the signal, which are then passed back to the user.  At a high level, we'd like to have an interface of the form:</p>
+<h2 id="Streaming-and-generators">Streaming and generators<a class="anchor-link" href="#Streaming-and-generators">&#182;</a></h2><p>The solution that we ultimately went with in version 0.7 is to use Python <a href="https://wiki.python.org/moin/Generators">generators</a>.  Rather than load the entire signal at once, we rely on <a href="https://github.com/bastibe/SoundFile">soundfile</a> to produce a <em>sequence</em> of fragments of the signal, which are then passed back to the user.  At a high level, we would like to have an interface of the form:</p>
 <div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">librosa</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">some_parameters</span><span class="p">):</span>
     <span class="n">some_function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="o">...</span>
 </pre></div>
-<p>where <code>y</code> now refers to a short excerpt of the much longer recording in question.  This raises a few more questions though:</p>
+<p>where <code>y</code> now refers to a short excerpt of the much longer recording in question.  However, this raises a few more questions:</p>
 <ol>
 <li>How big of an excerpt should we use?</li>
 <li>How do two neighboring excerpts relate to each-other?</li>
 <li>Can this be used with every function in librosa?</li>
 </ol>
-<p>To dig into those, we'll have to think a bit more about how librosa represents data.</p>
+<p>To dig into those, we have to think a bit more about how librosa represents data.</p>
 
 </div>
 </div>
@@ -1313,12 +1313,12 @@ This raises an obvious question:</p>
 <h2 id="Samples,-frames,-and-blocks">Samples, frames, and blocks<a class="anchor-link" href="#Samples,-frames,-and-blocks">&#182;</a></h2><p>An audio buffer <code>y</code> is typically viewed as a sequence of discrete <em>samples</em> <code>y[0], y[1], y[2], ...</code>.
 Most audio analyses operate at the level of <em>frames</em> of audio, for instance, taking <code>y[0] ... y[2047]</code> as one frame, followed by <code>y[512] ... y[2047 + 512]</code>, and so on.
 Each frame here consists of exactly 2048 samples, and the time difference from one frame to the next is always 512 samples.  (These are just the default parameters, of course.)</p>
-<p>For most analyses, e.g. those based on the <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform">short-time Fourier transform</a>, frames are modeled independently from one another.
-This means that it would be completely valid to process one frame entirely before moving on to the next, and indeed, many implementations operate in exactly this fashion.
-However, this can also be <strong>inefficient</strong> because it makes poor use of memory locality, as well as data- and algorithm-parallelism.
+<p>For most analysis cases, e.g. those based on the <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform">short-time Fourier transform</a>, frames are modeled independently from one another.
+This means that it would be completely valid to process one frame entirely before moving on to the next; and indeed, many implementations operate in exactly this fashion.
+However, this can also be inefficient because it makes poor use of memory locality, as well as data- and algorithm-parallelism.
 It is generally more efficient, especially in Python/numpy, to operate on multiple frames simultaneously.  This naturally incurs some latency while buffering data, but the end-result leads to improved throughput.</p>
 <p>Now, a naive solution here would be to simply load a relatively long fragment <code>y</code> consisting of multiple frames, and process them in parallel before moving on to the next fragment.
-The tricky part is handling the boundaries correctly.  If the <em>hop length</em> (number of samples between frames) is identical to the <em>frame length</em> (number of samples in each frame), then frames do not overlap, and we won't get into trouble processing data in this way.  However, if frames can overlap in time, then so should the longer fragments if we're to get the same answer at the end of the day.  This is where we need to be a bit careful.</p>
+The tricky part is handling the boundaries correctly.  If the <em>hop length</em> (number of samples between frames) is identical to the <em>frame length</em> (number of samples in each frame), then frames do not overlap, and we will not get into trouble by processing data in this way.  However, if frames can overlap in time, then so should the longer fragments if we are to get the same answer at the end of the day.  This is where we need to be a bit careful.</p>
 <h3 id="Blocks">Blocks<a class="anchor-link" href="#Blocks">&#182;</a></h3><p>The solution we adopted in librosa 0.7 is the notion of a <em>block</em>, which is defined in terms of the number of <em>frames</em>, the <em>frame length</em> and the <em>hop length</em> between frames.  Blocks overlap in exactly the same way that frames would normally: by <code>frame length - hop_length</code> samples.</p>
 <p>To make this concrete, imagine that we have a frame length of 100 samples, a hop length of 25 samples, and a block size of 3 frames.  The first few frames would look as follows:</p>
 <ul>
@@ -1363,8 +1363,8 @@ The tricky part is handling the boundaries correctly.  If the <em>hop length</em
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="What-does-and-does-not-work?">What does and does not work?<a class="anchor-link" href="#What-does-and-does-not-work?">&#182;</a></h2><p>Not all analyses support stream processing.  For instance, anything that requires total knowledge of a sequence, such as <a href="https://librosa.github.io/librosa/generated/librosa.segment.recurrence_matrix.html#librosa.segment.recurrence_matrix">recurrence matrix</a> generation, will clearly not work.  A bit more subtle are methods that rely on resampling, such as <code>librosa.cqt</code>.</p>
-<p>However, any STFT-based analysis (such as most of the <code>librosa.feature</code> module) should work fine, and this already covers a large chunk of use-cases.</p>
-<p>The <a href="https://librosa.github.io/librosa/auto_examples/plot_pcen_stream.html#sphx-glr-auto-examples-plot-pcen-stream-py">example gallery</a> includes a notebook demonstrating how to do stream-based processing with STFT and <a href="https://librosa.github.io/librosa/generated/librosa.core.pcen.html?highlight=pcen#librosa.core.pcen">pcen</a> normalization.</p>
+<p>However, any STFT-based analysis (such as most of the <code>librosa.feature</code> module) should work fine, and this already covers a large proportion of use cases.</p>
+<p>The <a href="https://librosa.github.io/librosa/auto_examples/plot_pcen_stream.html#sphx-glr-auto-examples-plot-pcen-stream-py">example gallery</a> includes a notebook which demonstrates how to do stream-based processing with STFT and <a href="https://librosa.github.io/librosa/generated/librosa.core.pcen.html?highlight=pcen#librosa.core.pcen">pcen</a> normalization.</p>
 
 </div>
 </div>
@@ -1373,8 +1373,8 @@ The tricky part is handling the boundaries correctly.  If the <em>hop length</em
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Block-based processing allows some, but not all of librosa's functionality to apply easily to large audio files.</p>
-<p>While in principle this could also be applied to online streaming from live recording devices, we don't yet have a stable underlying implementation to rely upon for this, and hesitate to make any general recommendations.</p>
-<p>If at some point in the future, streaming sample rate conversion becomes viable, we'll look at relaxing some of the constraints around resampling (e.g., on load or within <code>cqt</code>).</p>
+<p>While, in principle, this could also be applied to online streaming from live recording devices, we don't yet have a stable underlying implementation to rely upon for this, and hesitate to make any general recommendations.</p>
+<p>If, at some point in the future, streaming sample rate conversion becomes viable, we will look at relaxing some of the constraints around resampling (e.g., on load or within <code>cqt</code>).</p>
 
 </div>
 </div>
