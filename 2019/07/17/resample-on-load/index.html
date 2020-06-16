@@ -18,7 +18,7 @@
   <link rel="stylesheet" type="text/css" href="../../../../theme/font-awesome/css/solid.css">
 
 
-    <link href="https://librosa.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="librosa blog Atom">
+    <link href="https://librosa.org/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="librosa blog Atom">
 
 
 
@@ -55,8 +55,8 @@
       <nav>
         <ul class="list">
 
-          <li><a href="https://librosa.github.io/" target="_blank">home</a></li>
-          <li><a href="https://librosa.github.io/librosa" target="_blank">documentation</a></li>
+          <li><a href="https://librosa.org/" target="_blank">home</a></li>
+          <li><a href="https://librosa.org/librosa" target="_blank">documentation</a></li>
           <li><a href="https://groups.google.com/forum/#!forum/librosa" target="_blank">forum</a></li>
         </ul>
       </nav>
@@ -1204,45 +1204,7 @@ h6:hover .anchor-link {
 .highlight .vg { color: #19177C } /* Name.Variable.Global */
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
-.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
-<style type="text/css">
-/* Temporary definitions which will become obsolete with Notebook release 5.0 */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-bold { font-weight: bold; }
-</style>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>One of the questions that I get most often has to do with how <code>librosa</code> handles loading of audio data, specifically,</p>
@@ -1302,12 +1264,12 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="I-still-don't-like-it.--What-can-I-do?">I still don't like it.  What can I do?<a class="anchor-link" href="#I-still-don't-like-it.--What-can-I-do?">&#182;</a></h2><p>Sure, 22050 isn't right for every situation.  It's a default setting, but not a requirement!</p>
 <p>You have a few options though.  First, you can always bypass resample-on-load by specifying <code>sr=None</code>:</p>
-<div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 <p>You will need to remember to pass <code>sr</code> around to all relevant functions, and make sure your frame and hop lengths are tuned accordingly.</p>
 <p>A slightly fancier alternative is to use the <code>presets</code> package, as illustrated in the <a href="https://librosa.github.io/librosa/auto_examples/plot_presets.html#sphx-glr-auto-examples-plot-presets-py">example gallery</a> to change the default.  This approach uses some pythonic hackery to intercept function calls into a package (like <code>librosa</code>, but it works more generally), and gives you the option to override default parameter values.  The end result is not so different from carrying the specific <code>sr</code> value around with you, but it does make for slightly cleaner code since the defaults can all be set globally in a preamble, rather than replicated everywhere.  For example:</p>
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">presets</span> <span class="kn">import</span> <span class="n">Preset</span>
-<span class="kn">import</span> <span class="nn">librosa</span> <span class="kn">as</span> <span class="nn">_librosa</span>
+<span class="kn">import</span> <span class="nn">librosa</span> <span class="k">as</span> <span class="nn">_librosa</span>
 <span class="n">librosa</span> <span class="o">=</span> <span class="n">Preset</span><span class="p">(</span><span class="n">_librosa</span><span class="p">)</span>
 <span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;sr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">44100</span>
 <span class="n">librosa</span><span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4096</span>
