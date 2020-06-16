@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = 'librosa development team'
 SITENAME = 'librosa blog'
-SITEURL = 'https://librosa.github.io/blog'
+SITEURL = 'https://librosa.org/blog'
 SITESUBTITLE = '<code> import <span style="color: pink">librosa</span> </code>'
 SITELOGO = '/images/librosa_logo.png'
 
@@ -23,8 +23,8 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('home', 'https://librosa.github.io/'),
-         ('documentation', 'https://librosa.github.io/librosa'),
+LINKS = (('home', 'https://librosa.org/'),
+         ('documentation', 'https://librosa.org/librosa'),
          ('forum', 'https://groups.google.com/forum/#!forum/librosa'),)
 
 # Social widget

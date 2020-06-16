@@ -11,7 +11,7 @@ sys.path.append(os.curdir)
 from pelicanconf import *
 
 # If your site is available via HTTPS, make sure SITEURL begins with https://
-SITEURL = 'https://librosa.github.io/blog'
+SITEURL = 'https://librosa.org/blog'
 SITELOGO = '/blog/images/librosa_logo.png'
 RELATIVE_URLS = True
 
