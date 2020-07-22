@@ -1334,9 +1334,9 @@ The tricky part is handling the boundaries correctly.  If the <em>hop length</em
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="What-does-and-does-not-work?">What does and does not work?<a class="anchor-link" href="#What-does-and-does-not-work?">&#182;</a></h2><p>Not all analyses support stream processing.  For instance, anything that requires total knowledge of a sequence, such as <a href="https://librosa.github.io/librosa/generated/librosa.segment.recurrence_matrix.html#librosa.segment.recurrence_matrix">recurrence matrix</a> generation, will clearly not work.  A bit more subtle are methods that rely on resampling, such as <code>librosa.cqt</code>.</p>
+<h2 id="What-does-and-does-not-work?">What does and does not work?<a class="anchor-link" href="#What-does-and-does-not-work?">&#182;</a></h2><p>Not all analyses support stream processing.  For instance, anything that requires total knowledge of a sequence, such as <a href="https://librosa.org/doc/latest/generated/librosa.segment.recurrence_matrix.html?highlight=recurrence_matrix#librosa.segment.recurrence_matrix">recurrence matrix</a> generation, will clearly not work.  A bit more subtle are methods that rely on resampling, such as <code>librosa.cqt</code>.</p>
 <p>However, any STFT-based analysis (such as most of the <code>librosa.feature</code> module) should work fine, and this already covers a large proportion of use cases.</p>
-<p>The <a href="https://librosa.github.io/librosa/auto_examples/plot_pcen_stream.html#sphx-glr-auto-examples-plot-pcen-stream-py">example gallery</a> includes a notebook which demonstrates how to do stream-based processing with STFT and <a href="https://librosa.github.io/librosa/generated/librosa.core.pcen.html?highlight=pcen#librosa.core.pcen">pcen</a> normalization.</p>
+<p>The <a href="https://librosa.org/doc/latest/auto_examples/plot_pcen_stream.html#sphx-glr-auto-examples-plot-pcen-stream-py">example gallery</a> includes a notebook which demonstrates how to do stream-based processing with STFT and <a href="https://librosa.org/doc/latest/generated/librosa.pcen.html#librosa.pcen">pcen</a> normalization.</p>
 
 </div>
 </div>
