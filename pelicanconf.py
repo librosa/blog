@@ -24,7 +24,7 @@ AUTHOR_FEED_RSS = None
 
 # Blogroll
 LINKS = (('home', 'https://librosa.org/'),
-         ('documentation', 'https://librosa.org/librosa'),
+         ('documentation', 'https://librosa.org/doc'),
          ('forum', 'https://groups.google.com/forum/#!forum/librosa'),)
 
 # Social widget
